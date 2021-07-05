@@ -1,9 +1,10 @@
-package cli.commands
+package cli.commands.systems
 
-import caseapp.{Group, HelpMessage, Parser}
 import caseapp.core.help.Help
+import caseapp.{Group, HelpMessage, Parser}
+import cli.commands.OptionsHelpers.Mandatory
+import cli.commands.SharedOptions
 import packager.config.{RedHatSettings, SharedSettings}
-import OptionsHelpers._
 
 final case class RedHatOptions(
     @Group("RedHat")
@@ -28,7 +29,8 @@ final case class RedHatOptions(
       shared = sharedSettings,
       version = sharedOptions.version,
       description = sharedOptions.description,
-      license = license.mandatory("License parameter is mandatory for redHat package"),
+      license =
+        license.mandatory("License parameter is mandatory for redHat package"),
       release = release,
       rpmArchitecture = rpmArchitecture
     )

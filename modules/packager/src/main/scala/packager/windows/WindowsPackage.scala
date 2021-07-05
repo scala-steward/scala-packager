@@ -2,25 +2,32 @@ package packager.windows
 
 import packager.PackagerUtils.osWrite
 import packager.NativePackager
-import packager.config.WindowsSettings
+import packager.config.{SourceAppSettings, WindowsSettings}
 import packager.config.BuildSettings.{Msi, PackageExtension}
+import packager.config.SourceAppSettings.{JarAppSettings, LauncherSettings}
 
 case class WindowsPackage(
-    sourceAppPath: os.Path,
+    sourceSettings: SourceAppSettings,
     buildSettings: WindowsSettings
 ) extends NativePackager {
 
   private val wixConfigPath: os.Path = basePath / s"$packageName.wxs"
   private val licensePath: os.Path = basePath / s"license.rtf"
 
-  private val wixConfig: WindowsWixConfig = WindowsWixConfig(
-    packageName = packageName,
-    version = buildSettings.version,
-    manufacturer = buildSettings.maintainer,
-    productName = buildSettings.productName,
-    sourcePath = sourceAppPath,
-    licencePath = licensePath
-  )
+  private val wixConfig: WindowsWixConfig = {
+    sourceSettings match {
+      case launcherSettings: LauncherSettings =>
+        WindowsWixConfig(
+          packageName = packageName,
+          version = buildSettings.version,
+          manufacturer = buildSettings.maintainer,
+          productName = buildSettings.productName,
+          sourcePath = launcherSettings.launcherPath,
+          licencePath = licensePath
+        )
+      case _: JarAppSettings => ??? // TODO
+    }
+  }
 
   override def build(): Unit = {
     createConfFile()

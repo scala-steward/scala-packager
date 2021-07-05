@@ -1,9 +1,9 @@
-package cli.commands
+package cli.commands.systems
 
-import caseapp.{Group, HelpMessage, Parser}
 import caseapp.core.help.Help
+import caseapp.{Group, HelpMessage, Parser}
+import cli.commands.OptionsHelpers.Mandatory
 import packager.config.{MacOSSettings, SharedSettings}
-import OptionsHelpers._
 
 final case class MacOSOptions(
     @Group("MacOS")

@@ -1,9 +1,9 @@
 package cli.commands
 
 object OptionsHelpers {
-  implicit class Mandatory[A](x: Option[A]) {
+  implicit class Mandatory[A](value: Option[A]) {
     def mandatory(error: String): A = {
-      x match {
+      value match {
         case Some(v) => v
         case None =>
           System.err.println(error)

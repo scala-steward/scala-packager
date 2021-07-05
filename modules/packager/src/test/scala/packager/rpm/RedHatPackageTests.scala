@@ -12,7 +12,7 @@ class RedHatPackageTests extends munit.FunSuite with PackageHelper {
   if (Properties.isLinux) {
     test("should create rpmbuild directory ") {
 
-      val rpmPackage = RedHatPackage(echoLauncherPath, buildSettings)
+      val rpmPackage = RedHatPackage(launcherSettings, buildSettings)
 
       // create app directory
       rpmPackage.createRedHatDir()
@@ -27,7 +27,7 @@ class RedHatPackageTests extends munit.FunSuite with PackageHelper {
 
     test("should generate rpm package") {
 
-      val rpmPackage = RedHatPackage(echoLauncherPath, buildSettings)
+      val rpmPackage = RedHatPackage(launcherSettings, buildSettings)
 
       // create dmg package
       rpmPackage.build()

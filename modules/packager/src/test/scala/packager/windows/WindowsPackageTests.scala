@@ -13,7 +13,7 @@ class WindowsPackageTests extends munit.FunSuite with PackageHelper {
 
     test("should generate msi package") {
 
-      val msiPackage = WindowsPackage(echoLauncherPath, buildSettings)
+      val msiPackage = WindowsPackage(launcherSettings, buildSettings)
 
       // create msi package
       msiPackage.build()
@@ -24,7 +24,7 @@ class WindowsPackageTests extends munit.FunSuite with PackageHelper {
   }
 
   test("should exists default licence file for msi package") {
-    val msiPackage = WindowsPackage(echoLauncherPath, buildSettings)
+    val msiPackage = WindowsPackage(launcherSettings, buildSettings)
 
     val licencePath = msiPackage.buildSettings.licencePath
 

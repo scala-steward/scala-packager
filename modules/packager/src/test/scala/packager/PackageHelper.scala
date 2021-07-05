@@ -1,6 +1,8 @@
 package packager
 
+import packager.TestUtils.scalaPackagerJar
 import packager.config.BuildSettings.PackageExtension
+import packager.config.SourceAppSettings.{JarAppSettings, LauncherSettings}
 import packager.config.{BuildSettings, SharedSettings}
 
 trait PackageHelper {
@@ -14,6 +16,16 @@ trait PackageHelper {
     force = true,
     workingDirectoryPath = Some(tmpDir),
     outputPath = outputPackagePath
+  )
+
+  lazy val launcherSettings: LauncherSettings = LauncherSettings(
+    launcherPath = echoLauncherPath
+  )
+
+  lazy val jarAppSettings: JarAppSettings = JarAppSettings(
+    mainClass = "cli.PackagerCli",
+    mainJar = scalaPackagerJar().head,
+    artifactsPaths = scalaPackagerJar().tail
   )
 
   def buildSettings: BuildSettings

@@ -1,15 +1,24 @@
 package packager.mac.dmg
 
-import packager.config.MacOSSettings
+import packager.config.{MacOSSettings, SourceAppSettings}
 import packager.config.BuildSettings.{Dmg, PackageExtension}
+import packager.config.SourceAppSettings.{JarAppSettings, LauncherSettings}
 import packager.mac.MacOSNativePackager
 
-case class DmgPackage(sourceAppPath: os.Path, buildSettings: MacOSSettings)
-    extends MacOSNativePackager {
+case class DmgPackage(
+    sourceSettings: SourceAppSettings,
+    buildSettings: MacOSSettings
+) extends MacOSNativePackager {
 
   private val tmpPackageName = s"$packageName-tmp"
   private val mountpointPath = basePath / "mountpoint"
-  private val appSize: Long = os.size(sourceAppPath) / (1024L * 1024L) + 1
+  private val appSize: Long = {
+    sourceSettings match {
+      case launcherSettings: LauncherSettings =>
+        os.size(launcherSettings.launcherPath) / (1024L * 1024L) + 1
+      case _: JarAppSettings => ???
+    }
+  }
 
   override def build(): Unit = {
     os.proc(

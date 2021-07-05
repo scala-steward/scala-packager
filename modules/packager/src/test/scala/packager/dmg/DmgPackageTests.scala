@@ -13,7 +13,7 @@ class DmgPackageTests extends munit.FunSuite with PackageHelper {
   if (Properties.isMac) {
     test("should create app directory for dmg") {
 
-      val dmgPackage = DmgPackage(echoLauncherPath, buildSettings)
+      val dmgPackage = DmgPackage(launcherSettings, buildSettings)
 
       // create app directory
       dmgPackage.createAppDirectory()
@@ -27,7 +27,7 @@ class DmgPackageTests extends munit.FunSuite with PackageHelper {
 
     test("should generate dmg package") {
 
-      val dmgPackage = DmgPackage(echoLauncherPath, buildSettings)
+      val dmgPackage = DmgPackage(launcherSettings, buildSettings)
 
       // create dmg package
       dmgPackage.build()
@@ -36,7 +36,7 @@ class DmgPackageTests extends munit.FunSuite with PackageHelper {
     }
     test("size dmg package should be similar to the app") {
 
-      val dmgPackage = DmgPackage(echoLauncherPath, buildSettings)
+      val dmgPackage = DmgPackage(launcherSettings, buildSettings)
       val echoLauncherSize = os.size(echoLauncherPath)
 
       // create dmg package

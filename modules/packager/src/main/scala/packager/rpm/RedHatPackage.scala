@@ -2,11 +2,14 @@ package packager.rpm
 
 import packager.NativePackager
 import packager.PackagerUtils.{osCopy, osMove, osWrite}
-import packager.config.RedHatSettings
+import packager.config.{RedHatSettings, SourceAppSettings}
 import packager.config.BuildSettings.{PackageExtension, Rpm}
+import packager.config.SourceAppSettings.{JarAppSettings, LauncherSettings}
 
-case class RedHatPackage(sourceAppPath: os.Path, buildSettings: RedHatSettings)
-    extends NativePackager {
+case class RedHatPackage(
+    sourceSettings: SourceAppSettings,
+    buildSettings: RedHatSettings
+) extends NativePackager {
 
   private val redHatBasePath = basePath / "rpmbuild"
   private val sourcesDirectory = redHatBasePath / "SOURCES"
@@ -60,7 +63,15 @@ case class RedHatPackage(sourceAppPath: os.Path, buildSettings: RedHatSettings)
     )
 
   private def copyExecutableFile(): Unit = {
-    osCopy(sourceAppPath, sourcesDirectory / packageName)
+    sourceSettings match {
+      case launcherSettings: LauncherSettings =>
+        osCopy(
+          launcherSettings.launcherPath,
+          sourcesDirectory / packageName
+        )
+      case _: JarAppSettings => ???
+    }
+
   }
 
   override def extension: PackageExtension = Rpm

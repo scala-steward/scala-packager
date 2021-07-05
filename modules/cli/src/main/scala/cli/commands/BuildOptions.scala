@@ -2,6 +2,12 @@ package cli.commands
 
 import caseapp.{Group, HelpMessage, Name, Parser, Recurse}
 import caseapp.core.help.Help
+import cli.commands.systems.{
+  DebianOptions,
+  MacOSOptions,
+  RedHatOptions,
+  WindowsOptions
+}
 import packager.config._
 
 final case class BuildOptions(
@@ -19,6 +25,8 @@ final case class BuildOptions(
     macOS: MacOSOptions = MacOSOptions(),
     @Recurse
     windows: WindowsOptions = WindowsOptions(),
+    @Recurse
+    jarOptions: JarOptions = JarOptions(),
     @Group("Build")
     @HelpMessage("Overwrite destination file if it exists")
     @Name("f")
@@ -35,7 +43,9 @@ final case class BuildOptions(
     rpm: Boolean = false,
     msi: Boolean = false,
     dmg: Boolean = false,
-    pkg: Boolean = false
+    pkg: Boolean = false,
+    jar: Boolean = false,
+    launcher: Boolean = false
 ) {
 
   import BuildOptions.NativePackagerType

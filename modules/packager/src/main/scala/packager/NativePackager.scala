@@ -1,16 +1,16 @@
 package packager
 
-import packager.config.BuildSettings
+import packager.config.{BuildSettings, SourceAppSettings}
 import packager.config.BuildSettings.PackageExtension
 
 trait NativePackager {
 
-  def sourceAppPath: os.Path
+  def sourceSettings: SourceAppSettings
   def buildSettings: BuildSettings
-  implicit def options = buildSettings
+  implicit def options: BuildSettings = buildSettings
   def extension: PackageExtension
 
-  lazy val defaultPackageName = buildSettings.shared.outputPath.last
+  lazy val defaultPackageName: String = buildSettings.shared.outputPath.last
     .stripSuffix(s".${extension.toString.toLowerCase}")
 
   protected lazy val packageName: String =

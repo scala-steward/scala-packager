@@ -1,8 +1,9 @@
-package cli.commands
+package cli.commands.systems
 
 import caseapp.core.help.Help
 import caseapp.{Group, HelpMessage, Parser}
 import cli.commands.OptionsHelpers.Mandatory
+import cli.commands.SharedOptions
 import packager.config.{SharedSettings, WindowsSettings}
 
 final case class WindowsOptions(

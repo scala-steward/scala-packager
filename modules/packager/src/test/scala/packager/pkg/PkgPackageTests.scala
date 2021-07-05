@@ -13,7 +13,7 @@ class PkgPackageTests extends munit.FunSuite with PackageHelper {
   if (Properties.isMac) {
     test("should create app directory") {
 
-      val pkgPackage = PkgPackage(echoLauncherPath, buildSettings)
+      val pkgPackage = PkgPackage(launcherSettings, buildSettings)
 
       // create app directory
       pkgPackage.createAppDirectory()
@@ -27,7 +27,7 @@ class PkgPackageTests extends munit.FunSuite with PackageHelper {
 
     test("should generate pkg package") {
 
-      val pkgPackage = PkgPackage(echoLauncherPath, buildSettings)
+      val pkgPackage = PkgPackage(launcherSettings, buildSettings)
 
       // create pkg package
       pkgPackage.build()
@@ -52,7 +52,7 @@ class PkgPackageTests extends munit.FunSuite with PackageHelper {
 
     test("should copy post install script to pkg package") {
 
-      val pkgPackage = PkgPackage(echoLauncherPath, buildSettings)
+      val pkgPackage = PkgPackage(launcherSettings, buildSettings)
 
       // create deb package
       pkgPackage.build()

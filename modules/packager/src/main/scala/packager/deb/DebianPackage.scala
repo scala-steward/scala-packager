@@ -1,15 +1,19 @@
 package packager.deb
 
 import packager.PackagerUtils.{executablePerms, osCopy, osMove, osWrite}
-import packager.NativePackager
+import packager.{ConfLoader, NativePackager}
 import packager.config.BuildSettings.{Deb, PackageExtension}
-import packager.config.DebianSettings
+import packager.config.SourceAppSettings.{JarAppSettings, LauncherSettings}
+import packager.config.{DebianSettings, SourceAppSettings}
 
-case class DebianPackage(sourceAppPath: os.Path, buildSettings: DebianSettings)
-    extends NativePackager {
+case class DebianPackage(
+    sourceSettings: SourceAppSettings,
+    buildSettings: DebianSettings
+) extends NativePackager {
 
   private val debianBasePath = basePath / "debian"
   private val usrDirectory = debianBasePath / "usr"
+  private val libPath = usrDirectory / "share" / "lib"
   private val packageInfo = buildDebianInfo()
   private val metaData = buildDebianMetaData(packageInfo)
   private val mainDebianDirectory = debianBasePath / "DEBIAN"
@@ -33,8 +37,15 @@ case class DebianPackage(sourceAppPath: os.Path, buildSettings: DebianSettings)
     os.makeDir.all(mainDebianDirectory)
 
     createConfFile()
-    createScriptFile()
-    copyExecutableFile()
+
+    sourceSettings match {
+      case launcherSettings: LauncherSettings =>
+        copyExecutableFile(launcherSettings)
+        createLauncherScriptFile()
+      case jarAppSettings: JarAppSettings =>
+        copyArtifacts(jarAppSettings)
+        createJavaAPpScriptFile(jarAppSettings)
+    }
   }
 
   private def buildDebianMetaData(info: DebianPackageInfo): DebianMetaData =
@@ -53,26 +64,86 @@ case class DebianPackage(sourceAppPath: os.Path, buildSettings: DebianSettings)
       description = buildSettings.description
     )
 
-  private def copyExecutableFile(): Unit = {
+  private def copyExecutableFile(launcherSettings: LauncherSettings): Unit = {
     val scalaDirectory = usrDirectory / "share" / "scala"
     os.makeDir.all(scalaDirectory)
-    osCopy(sourceAppPath, scalaDirectory / packageName)
+    osCopy(
+      launcherSettings.launcherPath,
+      scalaDirectory / packageName
+    )
+  }
+
+  private def copyArtifacts(app: JarAppSettings): Unit = {
+    os.makeDir.all(libPath)
+    println(app.mainJar)
+    os.copy.over(app.mainJar, libPath / app.mainJar.last)
+
+    app.artifactsPaths.foreach(path => {
+      println(path)
+      os.copy.over(path, libPath / path.last)
+    })
   }
 
   private def createConfFile(): Unit = {
     osWrite(mainDebianDirectory / "control", metaData.generateContent())
   }
 
-  private def createScriptFile(): Unit = {
+  private def createLauncherScriptFile() = {
     val binDirectory = usrDirectory / "bin"
     os.makeDir.all(binDirectory)
     val launchScriptFile = binDirectory / packageName
-    val content = s"""#!/bin/bash
-                      |/usr/share/scala/$packageName \"$$@\"
-                      |""".stripMargin
+    val content = DebianPackage
+      .launcherScript(
+        packageName,
+        os.resource / 'packager / 'deb / "launcherScript.sh"
+      )
+      .load
+
+    osWrite(launchScriptFile, content, executablePerms)
+  }
+
+  private def createJavaAPpScriptFile(jarAppSettings: JarAppSettings): Unit = {
+    val binDirectory = usrDirectory / "bin"
+    os.makeDir.all(binDirectory)
+    val launchScriptFile = binDirectory / packageName
+
+    val content = DebianPackage
+      .javaAppScript(
+        jarAppSettings,
+        libPath,
+        os.resource / 'packager / 'deb / "launcherJarScript.sh"
+      )
+      .load
+
     osWrite(launchScriptFile, content, executablePerms)
   }
 
   override def extension: PackageExtension = Deb
 
+}
+
+case object DebianPackage {
+
+  def javaAppScript(
+      javaAppSettings: JarAppSettings,
+      libPath: os.Path,
+      script: os.ResourcePath
+  ) =
+    ConfLoader(script).withReplacements(
+      Map(
+        "main_jar" -> javaAppSettings.mainJar.toString,
+        "main_class" -> javaAppSettings.mainClass,
+        "lib_path" -> libPath.toString
+      )
+    )
+
+  def launcherScript(
+      packageName: String,
+      script: os.ResourcePath
+  ) =
+    ConfLoader(script).withReplacements(
+      Map(
+        "app_name" -> packageName
+      )
+    )
 }

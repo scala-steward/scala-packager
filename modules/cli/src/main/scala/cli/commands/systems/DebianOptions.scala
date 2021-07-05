@@ -1,7 +1,8 @@
-package cli.commands
+package cli.commands.systems
 
 import caseapp.core.help.Help
 import caseapp.{Group, HelpMessage, Parser, ValueDescription}
+import cli.commands.SharedOptions
 import packager.config.{DebianSettings, SharedSettings}
 
 final case class DebianOptions(
