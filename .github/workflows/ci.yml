@@ -3,6 +3,7 @@ on:
   push:
     branches:
     - master
+    - bugfix/rpm-package-test
     tags:
     - "v*"
   pull_request:
